@@ -1,0 +1,37 @@
+Terzo Incontro
+Raccolta dati estesi articoli
+
+1 Analisi
+	1.1 Scraping iniziale link in mode=full
+	1.2 Selezione categorie
+	1.3 template
+
+il template dei campi seleionati verrà diviso in versioni
+per le categorie che al loro interno presentano gli stessi campi
+per l'analisi specifica e per lavorare poi sui campi comuni filtrati
+aggregando in un dataset unico.
+
+2 Scraping categorie			
+	2.1 Sviluppo scraper
+	2.2 Scraping categorie/pubLink	>  per ogni chunk dataset collection, failed, empties (richieste html fallite, record vuoti)
+	2.3 Recurpero record vuori 
+	2.4 Unione chunk e controllo totale		(numero linee scraping == numero linee file input)
+
+3 Scraping articoli
+	3.1 Versioni scraper per categorie		(gestione campi multipli e vuoti)
+	3.2 unione e controllo dataset
+	3.3 
+
+4 Scraping Laboratori
+	4.1 Dataset FirstAuthor
+	4.2 Scraping lab da ...
+	4.3 Dataset Nome/laboratorio/publinks
+
+5  Analisi trend
+	4.1 Studio valori e selezione
+	4.2 Plot temporale delle categorie
+	4.3 Categorie per laboratori
+	(4.4 per Sezioni ?)
+
+7 Presentazione
+	

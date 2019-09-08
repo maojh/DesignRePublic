@@ -33,81 +33,83 @@ failedRequests = []
 
 time  = datetime.now()
 
-fileName = "../data/" + str(catName[0]) + "3_" + str(time.day) + "_" + str(time.month) + "_" + str(time.hour) + "_" + str(time.minute) + ".csv"
+fileName = "../data/" + str(catName[0]) + "4_" + str(time.day) + "_" + str(time.month) + "_" + str(time.hour) + "_" + str(time.minute) + ".csv"
 ofile = open(fileName,"wb")
 writer = csv.writer(ofile,delimiter=",")
-linkFile = "../data/data3" + str(catName[0]) + ".csv"
+linkFile = "../data/pubLink_part/data3" + str(catName[0]) + ".csv"
+# linkFile = "../data/data3" + str(catName[0]) + ".csv"
 counter = 0
 
 with open(linkFile,"rb") as f:
-	reader = csv.reader(f)
-	next(reader, None)
-	for pub in reader:
-		pub[1] = "https://re.public.polimi.it/handle/11311/" + pub[1][28:] + "?mode=full"
-		print "Scraping: " + pub[1]
-		print pub[0]
-		counter = counter + 1
-		# print pub[1]
-		try:
-			r = requests.get( pub[1] )
-			print bcolors.OKBLUE + str(r.status_code) + bcolors.ENDC
-			r.raise_for_status()
-		except requests.exceptions.RequestException as e:  # This is the correct syntax
-			failedRequests.append(pub[1])
-			print e
+    reader = csv.reader(f)
+    next(reader, None)
+    for pub in reader:
+        pub[1] = "https://re.public.polimi.it/handle/11311/" + pub[1][28:] + "?mode=full"
+        print "Scraping: " + pub[1]
+        print pub[0]
+        counter = counter + 1
+        # print pub[1]
+        try:
+            r = requests.get( pub[1] )
+            print bcolors.OKBLUE + str(r.status_code) + bcolors.ENDC
+            r.raise_for_status()
+        except requests.exceptions.RequestException as e:  # This is the correct syntax
+            failedRequests.append(pub[1])
+            print e
 
 
-		html = "".join(line.strip() for line in r.content.split("\n"))
-		soup = BeautifulSoup(html,'lxml')
-		rows = soup.find_all('tr')
+        html = "".join(line.strip() for line in r.content.split("\n"))
+        soup = BeautifulSoup(html,'lxml')
+        rows = soup.find_all('tr')
 
-		try:
-		 	# content = ['-'] * len(rows)
-			content = []
-			headers = []
+        try:
+             # content = ['-'] * len(rows)
+            content = []
+            headers = []
 
-			lastField = ""
-			for i in range(1, len(rows)-3):
-				cells = rows[i].find_all('td')
-				if (cells ==  []):
-					cells = rows[i].find_all('th')
-					if (cells == []):
-						emptyRows.append(pub[0])
-						print "Found empty row?! at ", pub[1]
-						break
+            lastField = ""
+            for i in range(1, len(rows)-3):
+                cells = rows[i].find_all('td')
+                if (cells ==  []):
+                    cells = rows[i].find_all('th')
+                    if (cells == []):
+                        emptyRows.append(pub[0])
+                        print "Found empty row?! at ", pub[1]
+                        break
 
-				field = cells[0].string		#at there is still an header in cells https://re.public.polimi.it/handle/11311/1008787
-				value  = cells[1].string
+                field = cells[0].string        #at there is still an header in cells https://re.public.polimi.it/handle/11311/1008787
+                value  = cells[1].string
 
-				# content = ['-'] * len(rows)
+                # content = ['-'] * len(rows)
 
-				if(field in ['dc.type.full','dc.description.full.text','dc.identifier.uri','dc.date.issued','dc.type.referee','dc.type.circulation','dc.publisher.name','dc.publisher.country','dc.publisher.place','dc.relation.ispartofbook','item.journal.title','dc.relation.medium','dc.relation.conferenceplace','dc.relation.conferencename','dc.title','dc.subject.keywordsita','dc.subject.keywords','item.collection','item.openaireRights','dc.description.numberofauthors']):
-					headers.append(field)
-					content.append(value)
-				elif(field in ['dc.language.iso','dc.authority.people']): #multiple value fields
-					if(field==lastField):
-						content[-1] += ";" + value
-					else:
-						headers.append(field)
-						content.append(value)
-				lastField = field
+                if(field in ['dc.type.full','dc.description.full.text','dc.identifier.uri','dc.date.issued','dc.type.referee','dc.type.circulation','dc.publisher.name','dc.publisher.country','dc.publisher.place','dc.relation.ispartofbook','item.journal.title','dc.relation.medium','dc.relation.conferenceplace','dc.relation.conferencename','dc.title','dc.subject.keywordsita','dc.subject.keywords','item.collection','item.openaireRights','dc.description.numberofauthors']):
+                    headers.append(field)
+                    content.append(value)
+                elif(field in ['dc.language.iso','dc.authority.people']): #multiple value fields
+                    if(field==lastField):
+                        content[-1] += ";" + value
+                    else:
+                        headers.append(field)
+                        content.append(value)
+                lastField = field
 
-			# for h in range(len(headers)):
-			# 	print str(headers[h]) + ' ' + str(content[h])
-			print str(counter)
-			records.append([headers,content])
-			print ''
-			#Testing: stop after 3 pubs
-		except Exception as e:
-			print bcolors.WARNING + str(e) + bcolors.ENDC
-			strangeRecords.append(pub)
-			print pub[1] + " is a strange records"
+            # for h in range(len(headers)):
+            #     print str(headers[h]) + ' ' + str(content[h])
+            print str(counter)
+            records.append([headers,content])
+            print ''
+            #Testing: stop after 3 pubs
+        except Exception as e:
+            print bcolors.WARNING + str(e) + bcolors.ENDC
+            strangeRecords.append(pub)
+            print pub[1] + " is a strange records"
+        # break
 
 allHeaders = []
 
 for r in records:
-	for h in r[0]:
-		allHeaders.append(h)
+    for h in r[0]:
+        allHeaders.append(h)
 
 print "records number: "
 print len(records)
@@ -117,6 +119,7 @@ setHeaders = set(allHeaders)
 headers = list(setHeaders)
 # print str(headers) + " | " + str(len(headers))
 
+print "writing"
 writer.writerow(headers)
 
 count = 0
@@ -139,15 +142,15 @@ for record in records:
                 print
                 content.append("XXXXXXXXXXXXXXXXXXXX")
         else:
-		posH = headers.index(head)
-		content[posH] = '-'
+            posH = headers.index(head)
+            content[posH] = '-'
 #            content.append("-")
 
     writer.writerow(content)
     # break
-print
+print ""
 
-print
+print ""
 print "strange records are " + str(len(strangeRecords))
 print "failed", str(len(failedRequests)), " requests"
 print "---"

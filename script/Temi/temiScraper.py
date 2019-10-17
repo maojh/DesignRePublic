@@ -14,7 +14,7 @@ stop = -1
 args = sys.argv[1:];
 
 records = []
-headers = ["title","author","year","type","keywords","cluster"]
+headers = ["title","author","year","type","keywords","cluster","collection"]
 strangeRecords = []
 i = 0
 
@@ -23,13 +23,13 @@ with open(args[0],"rb") as f:
 	reader = csv.reader(f)
 	header = next(reader, None)
 	for pub in reader:
-		print "starting"
+		print ("starting")
 
 		if(stop>0 and i>stop):
-			print "stopping"
+			print ("stopping")
 			break
 
-		print "Scraping: " + pub[0]
+		print ( "Scraping: " + pub[0] )
 		content = []
 		# indexes search
 		type = pub[header.index("item.collection")]
@@ -52,10 +52,10 @@ with open(args[0],"rb") as f:
 		content.append( str(type) )
 		content.append( pub[header.index("dc.subject.keywords")])
 		content.append( "nocluster" )
-		print content
+		print ( content )
 		if(len(content)<6):
 			strangeRecords.append(pub)
-			print pub[0] + " is a strange records"
+			print ( pub[0] + " is a strange records" )
 		else:
 			records.append(content)
 		i += 1
@@ -64,7 +64,7 @@ with open(args[0],"rb") as f:
 #print "All records: "
 #print records
 if (len(strangeRecords)>0):
-	print "strange records are " + str(len(strangeRecords))
+	print ( "strange records are " + str(len(strangeRecords)) )
 
 time  = datetime.now()
 
